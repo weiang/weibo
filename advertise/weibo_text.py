@@ -1,15 +1,23 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Get weibo's text feature
+'''
+	Usage: python ./weibo_text.py <data_set> [tag dict] [tag_pair dict]
+		   Generate weibo tag dict and tag_pair dict.
+'''
 
 import math
+import sys
 import jieba
 import jieba.analyse
 import Levenshtein
+from dictionary import *
 
-IN_CODE = u'utf-8'
-OUT_CODE = u'utf-8'
+IN_CODEC = u'utf-8'
+OUT_CODEC = u'utf-8'
+
+def usage():
+	print __doc__
 
 def weibo_tag_frequent(weibos):
 	tag_frequent = {}
@@ -18,7 +26,6 @@ def weibo_tag_frequent(weibos):
 		for tag in tags:
 			if tag not in tag_frequent:
 				tag_frequent[tag] = 0
-				# print 'Tag: ', tag.encode(OUT_CODE)
 		weibo_segments = jieba.cut(weibo)
 		for segment in weibo_segments:
 			if segment in tag_frequent:
@@ -42,7 +49,7 @@ def weibo_tag_weight(advertisement_weibos, normal_weibos):
 def pair_tags(str1, str2):
 	str1 = str1.strip(u' \n\t')
 	str2 = str2.strip(u' \n\t')
-# 	print 'key: %s, %s' %(str1.encode(OUT_CODE), str2.encode(OUT_CODE))
+# 	print 'key: %s, %s' %(str1.encode(OUT_CODEC), str2.encode(OUT_CODEC))
 
 	result = u''
 	if str1 < str2:
@@ -65,13 +72,13 @@ def weibo_tag_pair_frequent(weibos):
 			for j in range(i+1, len(tags)):
 #				print '%d, %d' %(i, j)
 				key = pair_tags(tags[i], tags[j])
-#				print 'key: %s' %(key.encode(OUT_CODE))
+#				print 'key: %s' %(key.encode(OUT_CODEC))
 				if key not in weibo_tag_pair_frequent:
 					weibo_tag_pair_frequent[key] = 0
 				weibo_tag_pair_frequent[key] += 1
 	
 #	for tag_pair in weibo_tag_pair_frequent:
-#		print '%s, %f' %(tag_pair.encode(OUT_CODE), weibo_tag_pair_frequent[tag_pair])
+#		print '%s, %f' %(tag_pair.encode(OUT_CODEC), weibo_tag_pair_frequent[tag_pair])
 	return weibo_tag_pair_frequent
 
 def weibo_tag_pair_weight(advertisement_weibos, normal_weibos):
@@ -109,7 +116,7 @@ def tag_frequent(weibo):
             tag_freq[seg] += 1
 
 #    for tag in tag_freq:
-#        print "Freq: %s, %d" %(tag.encode(OUT_CODE), tag_freq[tag])
+#        print "Freq: %s, %d" %(tag.encode(OUT_CODEC), tag_freq[tag])
     return tag_freq
     
     
@@ -164,32 +171,38 @@ def test_weibo_similarity():
     text2 = u"包邮 现价 来自 小票 原价 推荐 专柜 情侣 示范 跑步 经典 亲们 时尚 促销 跑鞋"
 
     print "weibo sim: ", weibo_similarity(text1, text2)
+    
+def get_weibo_dict(data_set, tag_dict, tag_pair_dict):
+    advertisement_weibos = []
+    normal_weibos = []
+    fd = open(data_set, 'r')
+    for line in fd:
+	line = line.decode(IN_CODEC)
+        line = line.strip(u' \t\n')
+        flag, text = line.split(u'\t')
+        if flag == u'1':
+            advertisement_weibos.append(text)
+        else:
+            normal_weibos.append(text)
+    fd.close()
 
-def main():
-	advertisement_weibos = []
-	fd = open('advertisement.txt', 'r')
-	for line in fd:
-		line = line.decode(IN_CODE)
-#		print line.encode(OUT_CODE)
-		advertisement_weibos.append(line)
-	fd.close()
-
-	normal_weibos = []
-	fd = open('normal.txt', 'r')
-	for line in fd:
-		line = line.decode(IN_CODE)
-		normal_weibos.append(line)
-	fd.close()
-
-#	result = weibo_tag_weight(advertisement_weibos, normal_weibos)
-	result = weibo_tag_pair_weight(advertisement_weibos, normal_weibos)
-
-	for tag in result:
-		print '%s, %f' %(tag.encode(OUT_CODE), result[tag])
+    result = weibo_tag_weight(advertisement_weibos, normal_weibos)
+    gen_tag_weight_dict(result, tag_dict)
+    result = weibo_tag_pair_weight(advertisement_weibos, normal_weibos)
+    gen_tag_pair_weight_dict(result, tag_pair_dict)
 
 if __name__ == '__main__':
-#	main()
-#        test_euc_similarity()
-#        test_lev_similarity()
-        test_weibo_similarity()
+    if len(sys.argv) < 2:
+        usage()
+        sys.exit(-1)
+    
+    data_set = sys.argv[1]
+    tag_dict = u'tag_weight.dict'
+    tag_pair_dict = u'tag_pair_weight.dict'
+    if len(sys.argv) >= 3:
+        tag_dict = sys.argv[2]
+    if len(sys.argv) >= 4:
+        tag_pair_dict = sys.argv[3]
+
+    get_weibo_dict(data_set, tag_dict, tag_pair_dict)
 
