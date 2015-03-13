@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Get weibo's text feature
+
 import math
 import jieba
 import jieba.analyse
