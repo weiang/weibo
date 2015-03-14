@@ -43,7 +43,7 @@ if __name__ == u'__main__':
 		weibos = ls[1:]
 		users[uid] = []
 		for weibo in weibos:
-			users[uid].append(weibos)
+			users[uid].append(weibo)
 
 
 	# Weibo
@@ -56,15 +56,17 @@ if __name__ == u'__main__':
 	for line in prefd:
 		pre.append(int(line.strip(u' \t\n')))
 
-	weibo_pre = dict(zip(l1, l2))
-
+	weibo_pre = dict(zip(weibos, pre))
+    
+#        for w in weibo_pre:
+#            print w, weibo_pre[w]
 	user_ad_counts = {}
 	for user in users:
 		user_ad_counts[user] = 0
 		for weibo in users[user]:
-			user_ad_counts[user] += weibo_pre[weibo]
+		    user_ad_counts[user] += weibo_pre[weibo]
 		total_weibos = len(users[user])
-		ad_rate = float(user_ad_counts[user]) / total_wiebos
+		ad_rate = float(user_ad_counts[user]) / total_weibos
 		if is_advertisor(ad_rate):
 			print user
 

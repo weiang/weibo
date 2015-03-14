@@ -8,21 +8,25 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-	echo "Usage: $0 <train data> <test data>"
+	echo "Usage: $0 <train data> <test data dir>"
 	exit -1
 fi
 
 TRAIN_DATA=$1
-TEST_DATA=$2
+TEST_DATA_DIR=$2
 python="/usr/bin/python"
 gen_dict_script="./gen_weibo_dict.py"
 gen_libsvm_script="./gen_libsvm_data.py"
 train_predict_script="./tools/easy.py"
 
+$python ./parse_json_weibo.py $TEST_DATA_DIR ./data/user.txt
+$python ./gen_test_weibo.py ./data/user.txt ./data/weibo.txt
+
 $python $gen_dict_script $TRAIN_DATA
 
 $python $gen_libsvm_script $TRAIN_DATA "${TRAIN_DATA}.libsvm"
-$python $gen_libsvm_script $TEST_DATA "${TEST_DATA}.libsvm"
+$python $gen_libsvm_script "./data/weibo.txt" "./data/weibo.txt.libsvm"
 
-$python $train_predict_script "${TRAIN_DATA}.libsvm" "${TEST_DATA}.libsvm"
+$python $train_predict_script "${TRAIN_DATA}.libsvm" "./data/weibo.txt.libsvm"
 
+$python ./gen_adv_users.py ./data/user.txt ./data/weibo.txt ./weibo.txt.libsvm.predict

@@ -112,9 +112,15 @@ def load_weibo_data(filename):
     fd = codecs.open(filename, 'r', IN_CODEC)
 
     weibos = []
-    for line in fd:
-        line = line.strip(u' \t\n')
-        flag, text = line.split(u'\t')
+    cnt = 0
+    for ln in fd:
+        cnt += 1
+#        print '%d: %s' %(cnt, ln.strip(u'\n').encode(OUT_CODEC))
+        ln = ln.strip(u' \t\n')
+        line = ln.split(u'\t')
+#        print "Len: %d" %(len(line))
+        flag = line[0]
+        text = line[1]
         w = Weibo(text)
         if flag == u'1':
             w.is_ad = True
