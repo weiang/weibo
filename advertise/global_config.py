@@ -11,6 +11,6 @@ class Singleton(object):
 		return cls._instance
 
 class Global_config(Singleton):
-    advertisement_threshold = 0.5
+    advertiser_threshold = 0.5
     advertisement_frequent_tags = 5
     advertisement_frequent_tags_pair = 5

@@ -103,7 +103,7 @@ class User:
 
     def is_advertiser(self):
         rate = advertisement_rate(self.released_weibos)
-        if rate > global_conf.advertisement_threshold:
+        if rate > global_config.advertiser_threshold:
             return True
         else:
             return False
