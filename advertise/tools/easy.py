@@ -9,13 +9,14 @@ if len(sys.argv) <= 1:
 	raise SystemExit
 
 # svm, grid, and gnuplot executable files
-
+path=os.getcwd()
+# print "Path: ", path
 is_win32 = (sys.platform == 'win32')
 if not is_win32:
-	svmscale_exe = "../svm-scale"
-	svmtrain_exe = "../svm-train"
-	svmpredict_exe = "../svm-predict"
-	grid_py = "./grid.py"
+	svmscale_exe = path +"/tools/svm-scale"
+	svmtrain_exe = path + "/tools/svm-train"
+	svmpredict_exe = path + "/tools/svm-predict"
+	grid_py = path + "/tools/grid.py"
 	gnuplot_exe = "/usr/bin/gnuplot"
 else:
         # example for windows
